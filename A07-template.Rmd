@@ -75,13 +75,17 @@ Stat <- Stations %>%
 Trip <- Trips %>%
   select(sstation, estation, client, sdate, edate) %>%
   group_by(client) %>%
-  summarize(duration = as.numeric(edate-sdate))
+  summarize(duration = as.numeric(edate-sdate)) %>%
+  filter(duration < 300)
 
 
-
+Trip %>%
+  ggplot(aes(x = client, y = duration, color = client)) +
+  geom_boxplot() 
 
 
 ```
+The graph shows that registered clients have a much higher average duration time (in minutes) than those who are considered casual clients.
 
 
 ## Question 2: When are bikes used?
