@@ -79,6 +79,7 @@ Trip <- Trips %>%
   filter(duration < 300)
 
 
+
 Trip %>%
   ggplot(aes(x = client, y = duration, color = client)) +
   geom_boxplot() 
@@ -118,10 +119,18 @@ You can use [Figure 18.3](https://dtkaplan.github.io/DataComputingEbook/project-
 ```{r}
 ### Your Code Here
 
+Trip2 <- Trips %>%
+  select(sstation, estation, client, sdate, edate) %>%
+  mutate(duration = as.numeric(edate-sdate)) %>%
+  filter(duration < 300)
+
+Trip2 %>%
+  ggplot(aes(x = lubridate::yday(sdate)), y = duration) +
+  geom_density()
+
 ```
 
-
-My observations here..... 
+The graph shows the rentals that take place in the later months of the year. More people use rentals during the fall rather than the winter.
 
 
 ### Day of Week
@@ -129,10 +138,13 @@ My observations here.....
 ```{r}
 ### Your Code Here
 
+Trip2 %>%
+  ggplot(aes(x = lubridate::wday(sdate)), y = duration) +
+  geom_density()
 ```
 
 
-My observations here..... 
+The graph shows a fairly equal amount of rental duration throughout the week. The durations go up slightly towards the end of the week but drop on the weekends.
 
 
 
@@ -141,10 +153,13 @@ My observations here.....
 ```{r}
 ### Your Code Here
 
+Trip2 %>%
+  ggplot(aes(x = lubridate::hour(sdate)), y = duration) +
+  geom_density()
 ```
 
 
-My observations here..... 
+Barely any rentals take place in the early hours of the day, but two peaks are seen at around 8 in the morning, and 5-6 in the evening.
 
 
 
@@ -153,10 +168,12 @@ My observations here.....
 ```{r}
 ### Your Code Here
 
+Trip2 %>%
+  ggplot(aes(x = lubridate::minute(sdate)), y = duration) +
+  geom_density()
 ```
 
-
-My observations here..... 
+There is not much of a pattern to be seen when it comes to the duration depending on the minute of the hour it is being taken out.
 
 
 ## Question 3: Grouping
@@ -165,7 +182,14 @@ Group the bike rentals by three variables: hour of the day, day of the week, and
 
 ```{r}
 ### My Code here
+Trips3 <- Trip2 %>%
+  group_by(lubridate::hour(sdate), lubridate::wday(sdate), client) %>%
+  summarise(count = n())
 
+Trips3 %>%
+  ggplot(aes(x = count, y = lubridate::hour(sdate)), group = lubridate::wday(sdate)) +
+  geom_line() +
+  facet_wrap( ~ client)
 ```
 
 My comments here.....
@@ -193,7 +217,8 @@ Simple <-
 Simple2 <-
   Simple %>%
   rename(estation = sstation, lat2 = lat, long2 = long)
-
+head(Simple)
+head(Simple2)
 ```
 
 Look at the `head()` of `Simple` and `Simple2` and make sure you understand how they are related to `Stations.`
